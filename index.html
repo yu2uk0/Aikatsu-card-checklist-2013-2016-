@@ -3,32 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>アイカツ！カード所持チェッカー (機能拡張版)</title>
+  <title>アイカツ！カード所持チェッカー</title>
   
-  <!-- ハッピールイカ風のポップ・太字で可愛いWebフォント（Google Fonts） -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Murecho:wght@400;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Murecho:wght@500;700;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 
   <style>
+    /* ==========================================================================
+       1. 変数・基本設定
+       ========================================================================== */
     :root {
-      --primary-pink: #ff69b4;
-      --light-pink: #fff0f6;
-      --accent-pink: #ff1493;
-      --dark-pink: #c71585;
-      --bg-white: #ffffff;
-      --text-color: #333333;
-      --border-color: #ffb6c1;
+      --bg-color: #fce4ec;
+      --card-bg: #ffffff;
+      --text-main: #4a4a4a;
+      
+      /* タイプ別テーマカラー */
+      --cute-color: #ff69b4;
+      --cute-bg: #fff0f5;
+      --cool-color: #1e90ff;
+      --cool-bg: #f0f8ff;
+      --sexy-color: #9370db;
+      --sexy-bg: #f8f8ff;
+      --pop-color: #ff8c00;
+      --pop-bg: #fffaf0;
+      
+      --rarity-sec: #ffd700;
+      --rarity-pr: #ff69b4;
+      --rarity-r: #1e90ff;
+      --rarity-n: #a9a9a9;
 
-      /* タイプ別カラー */
-      --type-cute: #ff80ab;
-      --type-cool: #4dd0e1;
-      --type-sexy: #ba68c8;
-      --type-pop: #ffd54f;
+      --font-heading: 'Dela Gothic One', cursive, sans-serif;
+      --font-body: 'Zen Maru Gothic', sans-serif;
+      --font-ui: 'Murecho', sans-serif;
 
-      /* フォント定義 */
-      --font-display: 'Dela Gothic One', 'Zen Maru Gothic', 'HG丸ゴシックM-PRO', sans-serif;
-      --font-body: 'Murecho', 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.15);
     }
 
     * {
@@ -38,1211 +50,221 @@
     }
 
     body {
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(#ffb6c1 15%, transparent 16%),
+        radial-gradient(#ffb6c1 15%, transparent 16%);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      color: var(--text-main);
       font-family: var(--font-body);
-      background-color: var(--light-pink);
-      color: var(--text-color);
-      padding-bottom: 40px;
+      min-height: 100vh;
+      padding: 20px 10px 60px;
     }
 
-    /* ヘッダー */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       2. ヘッダー＆プログレス
+       ========================================================================== */
     header {
-      background: linear-gradient(135deg, var(--primary-pink), var(--accent-pink));
-      color: var(--bg-white);
       text-align: center;
-      padding: 22px 15px;
-      box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      margin-bottom: 24px;
     }
 
-    header h1 {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      margin-bottom: 6px;
-      letter-spacing: 1.5px;
-      text-shadow: 2px 2px 0px rgba(199, 21, 133, 0.4);
+    h1 {
+      font-family: var(--font-heading);
+      color: #ff1493;
+      font-size: 2.2rem;
+      text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0 4px 8px rgba(0,0,0,0.15);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
     }
 
-    /* ダッシュボード (進捗状況) */
     .dashboard {
-      background: var(--bg-white);
-      border-radius: 12px;
-      padding: 15px;
-      max-width: 960px;
-      margin: 15px auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border: 2px solid var(--border-color);
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-md);
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
       gap: 10px;
+      margin-bottom: 20px;
+      border: 3px solid #ffb6c1;
     }
 
-    .stats {
-      font-size: 1rem;
-      font-weight: bold;
-      color: var(--dark-pink);
-      font-family: var(--font-display);
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-ui);
+      font-weight: 700;
+    }
+
+    .stats-count {
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .stats-count span {
+      font-size: 1.5rem;
+      color: #ff1493;
+      font-family: var(--font-heading);
     }
 
     .progress-bar-container {
       width: 100%;
-      height: 16px;
-      background-color: #ffe4e1;
-      border-radius: 8px;
+      height: 20px;
+      background-color: #f0f0f0;
+      border-radius: 10px;
       overflow: hidden;
+      border: 2px solid #e0e0e0;
+      position: relative;
     }
 
-    .progress-bar {
+    .progress-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--primary-pink), var(--accent-pink));
+      background: linear-gradient(90deg, #ff69b4, #ff1493);
       width: 0%;
-      transition: width 0.3s ease;
+      transition: width 0.4s ease;
+      border-radius: 8px;
     }
 
-    /* アクションエリア（登録・一括操作） */
-    .top-actions {
-      max-width: 960px;
-      margin: 0 auto 15px auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 0 10px;
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: #333;
+      text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
     }
 
-    .action-group {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      background-color: var(--accent-pink);
-      color: #fff;
-      border: none;
-      padding: 8px 14px;
+    /* ==========================================================================
+       3. フィルター＆操作パネル
+       ========================================================================== */
+    .controls-panel {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(5px);
       border-radius: 20px;
-      font-size: 0.85rem;
-      font-family: var(--font-body);
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(255, 20, 147, 0.3);
-      transition: background 0.2s, transform 0.1s;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 2px solid #fff;
     }
 
-    .btn:hover {
-      background-color: var(--dark-pink);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background-color: #6c757d;
-      box-shadow: 0 2px 6px rgba(108, 117, 125, 0.3);
-    }
-    .btn-secondary:hover {
-      background-color: #5a6268;
-    }
-
-    /* 絞り込み・検索・並べ替えコントロール */
-    .controls {
-      background: var(--bg-white);
-      padding: 15px;
-      border-radius: 12px;
-      max-width: 960px;
-      margin: 0 auto 20px auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border: 1px solid var(--border-color);
+    .filter-group {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
     }
 
-    .controls select, .controls input {
-      padding: 8px 12px;
-      border: 1.5px solid var(--border-color);
-      border-radius: 6px;
-      outline: none;
+    .filter-label {
       font-size: 0.85rem;
+      font-weight: 700;
+      color: #666;
+      min-width: 60px;
+    }
+
+    select, input[type="text"] {
+      padding: 8px 12px;
+      border: 2px solid #ffb6c1;
+      border-radius: 12px;
       font-family: var(--font-body);
-      font-weight: bold;
+      font-size: 0.9rem;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: #ff1493;
     }
 
     .search-input {
       flex: 1;
-      min-width: 180px;
+      min-width: 160px;
     }
 
-    /* グリッドレイアウト */
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 10px;
-    }
-
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    /* 個別カードスタイル */
-    .card-item {
-      background: var(--bg-white);
-      border-radius: 10px;
-      border: 3px solid var(--border-color);
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
       align-items: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .card-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(255, 105, 180, 0.2);
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
     }
 
-    .card-item.owned {
-      background-color: #fff6f9;
+    .btn-primary {
+      background: #ff1493;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #e01180; }
+
+    .btn-secondary {
+      background: #fff;
+      color: #555;
+      border: 2px solid #ddd;
+    }
+    .btn-secondary:hover { background: #f5f5f5; }
+
+    .btn-success {
+      background: #4caf50;
+      color: #fff;
+    }
+    .btn-danger {
+      background: #f44336;
+      color: #fff;
     }
 
-    /* タイプ別の枠線カラー */
-    .card-item[data-type="キュート"] { border-color: var(--type-cute); }
-    .card-item[data-type="クール"]   { border-color: var(--type-cool); }
-    .card-item[data-type="セクシー"] { border-color: var(--type-sexy); }
-    .card-item[data-type="ポップ"]   { border-color: var(--type-pop); }
-
-    /* タイプ別のバッジカラー */
-    .card-badge-container {
+    .action-row {
       display: flex;
       justify-content: space-between;
-      width: 100%;
-      align-items: center;
-      margin-bottom: 6px;
-      padding-right: 40px;
-    }
-
-    .card-badge {
-      font-size: 0.7rem;
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-weight: bold;
-      color: #fff;
-      font-family: var(--font-body);
-    }
-    .card-item[data-type="キュート"] .card-badge { background-color: var(--type-cute); }
-    .card-item[data-type="クール"]   .card-badge { background-color: var(--type-cool); }
-    .card-item[data-type="セクシー"] .card-badge { background-color: var(--type-sexy); }
-    .card-item[data-type="ポップ"]   .card-badge { background-color: var(--type-pop); color: #333; }
-
-    .rarity-badge {
-      font-size: 0.7rem;
-      font-weight: bold;
-      color: #d97706;
-      background: #fef3c7;
-      border: 1px solid #f59e0b;
-      padding: 2px 5px;
-      border-radius: 4px;
-    }
-
-    /* カードの個別編集ボタン */
-    .edit-btn-icon {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #f0f0f0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      padding: 2px 6px;
-      cursor: pointer;
-      color: #555;
-      font-family: var(--font-body);
-      font-weight: bold;
-    }
-
-    .edit-btn-icon:hover {
-      background: #e0e0e0;
-    }
-
-    /* 3Dカードめくり（フリップ）コンテナ */
-    .card-flip-container {
-      perspective: 800px;
-      width: 140px;
-      height: 196px;
-      margin-bottom: 6px;
-    }
-
-    .card-flipper {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
-    }
-
-    .card-flipper.is-flipped {
-      transform: rotateY(180deg);
-    }
-
-    .card-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px dashed var(--border-color);
-      background-color: #fafafa;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .card-face.back {
-      transform: rotateY(180deg);
-    }
-
-    .card-face img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .upload-hint {
-      font-size: 0.7rem;
-      color: #888;
-      text-align: center;
-      padding: 4px;
-      font-family: var(--font-body);
-    }
-
-    .file-input { display: none; }
-
-    /* 画像コントロール (めくり & 削除) */
-    .image-controls {
-      display: flex;
-      gap: 4px;
-      width: 100%;
-      margin-bottom: 8px;
-    }
-
-    .flip-btn {
-      flex: 1;
-      padding: 4px 0;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background: #fff;
-      color: var(--dark-pink);
-      font-size: 0.75rem;
-      font-weight: bold;
-      font-family: var(--font-body);
-      cursor: pointer;
-    }
-
-    .img-del-btn {
-      padding: 4px 6px;
-      border: 1px solid #ff4d4d;
-      border-radius: 4px;
-      background: #fff;
-      color: #ff4d4d;
-      font-size: 0.7rem;
-      cursor: pointer;
-    }
-
-    .card-title {
-      font-family: var(--font-display);
-      font-size: 0.85rem;
-      text-align: center;
-      margin-bottom: 2px;
-      min-height: 2.4em;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      letter-spacing: 0.5px;
-    }
-
-    .card-brand {
-      font-size: 0.7rem;
-      color: var(--dark-pink);
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
-
-    .card-meta {
-      font-size: 0.75rem;
-      color: #666;
-      margin-bottom: 8px;
-      text-align: center;
-      font-family: var(--font-body);
-      font-weight: bold;
-    }
-
-    /* チェックボタン */
-    .check-btn {
-      width: 100%;
-      padding: 6px 0;
-      border: none;
-      border-radius: 6px;
-      background-color: #e0e0e0;
-      color: #666;
-      font-weight: bold;
-      font-family: var(--font-display);
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    .card-item.owned .check-btn {
-      background-color: var(--accent-pink);
-      color: var(--bg-white);
-    }
-
-    .quantity-control {
-      display: flex;
-      align-items: center;
       gap: 8px;
-      margin-top: 6px;
+      flex-wrap: wrap;
+      border-top: 1px dashed #ffb6c1;
+      padding-top: 12px;
     }
 
-    .qty-btn {
-      width: 22px;
-      height: 22px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-white);
-      color: var(--dark-pink);
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 4px;
+    /* ==========================================================================
+       4. カードグリッド＆3Dフリップ
+       ========================================================================== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
     }
 
-    .qty-count {
-      font-size: 0.8rem;
-      font-weight: bold;
-      font-family: var(--font-body);
-    }
-
-    /* モーダル表示 */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal {
-      background: var(--bg-white);
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 450px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      border: 2px solid var(--primary-pink);
-    }
-
-    .modal h2 {
-      font-family: var(--font-display);
-      font-size: 1.3rem;
-      color: var(--dark-pink);
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .modal-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .modal-form label {
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: #555;
-    }
-
-    .modal-form input, .modal-form select {
-      padding: 8px 10px;
-      border: 1.5px solid var(--border-color);
-      border-radius: 6px;
-      outline: none;
-      font-size: 0.9rem;
-      font-family: var(--font-body);
-      font-weight: bold;
-      width: 100%;
-    }
-
-    .custom-brand-container {
-      margin-top: 6px;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .btn-save {
-      flex: 1;
-      background-color: var(--accent-pink);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      font-family: var(--font-body);
-      cursor: pointer;
-    }
-
-    .btn-cancel {
-      flex: 1;
-      background-color: #ccc;
-      color: #333;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      font-family: var(--font-body);
-      cursor: pointer;
-    }
-
-    .btn-delete-card {
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      font-family: var(--font-body);
-      cursor: pointer;
-      margin-top: 5px;
-    }
-    
-    /* 新しいカードを登録ボタンを画面右下に固定表示 */
-.add-btn, #addCardBtn, .floating-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-  padding: 14px 24px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #fff;
-  background: linear-gradient(135deg, #ff69b4, #ff1493); /* アイカツ風ピンク */
-  border: none;
-  border-radius: 50px; /* 丸みのあるデザイン */
-  box-shadow: 0 4px 12px rgba(255, 20, 147, 0.4);
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-/* タップ時の押し込み効果 */
-.add-btn:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(255, 20, 147, 0.4);
-}
-  </style>
-</head>
-<body>
-
-  <header>
-    <h1>✨ アイカツ！カード 所持チェッカー ✨</h1>
-    <p style="font-size:0.8rem; opacity:0.9;">第1弾 〜 2016シリーズ第4弾（カスタム機能対応）</p>
-  </header>
-
-  <!-- 進捗ダッシュボード -->
-  <div class="dashboard">
-    <div class="stats" id="statsDisplay">所持率: 0 / 0 枚 (0%)</div>
-    <div class="progress-bar-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-  </div>
-
-  <!-- トップアクションエリア -->
-  <div class="top-actions">
-    <div class="action-group">
-      <button class="btn" onclick="openModal('add')">＋ 新しいカードを登録</button>
-    </div>
-    <div class="action-group">
-      <button class="btn btn-secondary" onclick="bulkSetOwned(true)">表示中をすべて所持</button>
-      <button class="btn btn-secondary" onclick="bulkSetOwned(false)">表示中をクリア</button>
-    </div>
-  </div>
-
-  <!-- 絞り込み・検索・並べ替えコントロール -->
-  <div class="controls">
-    <select id="seriesFilter" onchange="render()">
-      <option value="ALL">すべての弾</option>
-      <option value="13-1">2013年 第1弾</option>
-      <option value="13-2">2013年 第2弾</option>
-      <option value="13-3">2013年 第3弾</option>
-      <option value="13-4">2013年 第4弾</option>
-      <option value="13-5">2013年 第5弾</option>
-      <option value="13-6">2013年 第6弾</option>
-      <option value="14-1">2014年 第1弾</option>
-      <option value="14-2">2014年 第2弾</option>
-      <option value="14-3">2014年 第3弾</option>
-      <option value="14-4">2014年 第4弾</option>
-      <option value="14-5">2014年 第5弾</option>
-      <option value="14-6">2014年 第6弾</option>
-      <option value="15-1">2015年 第1弾</option>
-      <option value="15-2">2015年 第2弾</option>
-      <option value="15-3">2015年 第3弾</option>
-      <option value="15-4">2015年 第4弾</option>
-      <option value="15-5">2015年 第5弾</option>
-      <option value="15-6">2015年 第6弾</option>
-      <option value="16-1">2016年 第1弾</option>
-      <option value="16-2">2016年 第2弾</option>
-      <option value="16-3">2016年 第3弾</option>
-      <option value="16-4">2016年 第4弾</option>
-    </select>
-
-    <select id="typeFilter" onchange="render()">
-      <option value="ALL">すべてのタイプ</option>
-      <option value="キュート">キュート</option>
-      <option value="クール">クール</option>
-      <option value="セクシー">セクシー</option>
-      <option value="ポップ">ポップ</option>
-    </select>
-
-    <select id="rarityFilter" onchange="render()">
-      <option value="ALL">すべてのレアリティ</option>
-      <option value="PR">PR (プレミアムレア)</option>
-      <option value="R">R (レア)</option>
-      <option value="N">N (ノーマル)</option>
-      <option value="CP">CP (キャンペーン)</option>
-    </select>
-
-    <select id="statusFilter" onchange="render()">
-      <option value="ALL">すべての状態</option>
-      <option value="OWNED">所持のみ</option>
-      <option value="UNOWNED">未所持のみ</option>
-    </select>
-
-    <select id="sortSelect" onchange="render()">
-      <option value="ID_ASC">並べ替え: 型番順 (小→大)</option>
-      <option value="ID_DESC">並べ替え: 型番順 (大→小)</option>
-      <option value="RARITY_DESC">並べ替え: レアリティ (高→低)</option>
-      <option value="RARITY_ASC">並べ替え: レアリティ (低→高)</option>
-    </select>
-
-    <input type="text" id="searchInput" class="search-input" placeholder="カード名・ブランド・型番で検索..." oninput="render()">
-  </div>
-
-  <!-- カード一覧 -->
-  <div class="container">
-    <div class="card-grid" id="cardGrid"></div>
-  </div>
-
-  <!-- カード登録・編集 モーダルダイアログ -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <h2 id="modalTitle">カード登録</h2>
-      <form class="modal-form" id="cardForm" onsubmit="handleFormSubmit(event)">
-        <input type="hidden" id="editCardKey">
-        
-        <div>
-          <label for="seriesSelect">シリーズ・弾</label>
-          <select id="seriesSelect" onchange="autoFillCardIdPrefix()">
-            <option value="13-1">2013年 第1弾</option>
-            <option value="13-2">2013年 第2弾</option>
-            <option value="13-3">2013年 第3弾</option>
-            <option value="13-4">2013年 第4弾</option>
-            <option value="13-5">2013年 第5弾</option>
-            <option value="13-6">2013年 第6弾</option>
-            <option value="14-1">2014年 第1弾</option>
-            <option value="14-2">2014年 第2弾</option>
-            <option value="14-3">2014年 第3弾</option>
-            <option value="14-4">2014年 第4弾</option>
-            <option value="14-5">2014年 第5弾</option>
-            <option value="14-6">2014年 第6弾</option>
-            <option value="15-1">2015年 第1弾</option>
-            <option value="15-2">2015年 第2弾</option>
-            <option value="15-3">2015年 第3弾</option>
-            <option value="15-4">2015年 第4弾</option>
-            <option value="15-5">2015年 第5弾</option>
-            <option value="15-6">2015年 第6弾</option>
-            <option value="16-1">2016年 第1弾</option>
-            <option value="16-2">2016年 第2弾</option>
-            <option value="16-3">2016年 第3弾</option>
-            <option value="16-4">2016年 第4弾</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="cardIdInput">型番 (例: 01-01 / 14 01-01)</label>
-          <input type="text" id="cardIdInput" required placeholder="型番を入力">
-        </div>
-
-        <div>
-          <label for="cardNameInput">カード名</label>
-          <input type="text" id="cardNameInput" required placeholder="カード名を入力">
-        </div>
-
-        <div>
-          <label for="typeSelect">タイプ</label>
-          <select id="typeSelect">
-            <option value="キュート">キュート</option>
-            <option value="クール">クール</option>
-            <option value="セクシー">セクシー</option>
-            <option value="ポップ">ポップ</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="raritySelect">レアリティ</label>
-          <select id="raritySelect">
-            <option value="N">N (ノーマル)</option>
-            <option value="R">R (レア)</option>
-            <option value="PR">PR (プレミアムレア)</option>
-            <option value="CP">CP (キャンペーン)</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="brandSelect">ブランド名</label>
-          <select id="brandSelect" onchange="toggleCustomBrandInput()">
-            <option value="ノーブランド">ノーブランド</option>
-            <option value="Angery Suger">Angery Suger</option>
-            <option value="FUTURING GIRL">FUTURING GIRL</option>
-            <option value="SPICY AGEHA">SPICY AGEHA</option>
-            <option value="HAPPY RAINBOW">HAPPY RAINBOW</option>
-            <option value="LoLi GoThiC">LoLi GoThiC</option>
-            <option value="Aurora Fantasy">Aurora Fantasy</option>
-            <option value="LOVE QUEEN">LOVE QUEEN</option>
-            <option value="MAGICAL TOY">MAGICAL TOY</option>
-            <option value="Swing ROCK">Swing ROCK</option>
-            <option value="Bohemian Sky">Bohemian Sky</option>
-            <option value="LOVE MOONRISE">LOVE MOONRISE</option>
-            <option value="ViVid Kiss">ViVid Kiss</option>
-            <option value="Dreamy Crown">Dreamy Crown</option>
-            <option value="Sangria Rosa">Sangria Rosa</option>
-            <option value="桜色花伝">桜色花伝</option>
-            <option value="Dance Fusion">Dance Fusion</option>
-            <option value="Retoro Clover">Retoro Clover</option>
-            <option value="Dolly devil">Dolly devil</option>
-            <option value="Mecha PaniQ">Mecha PaniQ</option>
-            <option value="OTHER">その他 (自由入力)</option>
-          </select>
-          <div class="custom-brand-container" id="customBrandContainer" style="display: none;">
-            <input type="text" id="customBrandInput" placeholder="ブランド名を入力">
-          </div>
-        </div>
-
-        <div>
-          <label for="categorySelect">カテゴリー</label>
-          <select id="categorySelect">
-            <option value="トップス">トップス</option>
-            <option value="ボトムス">ボトムス</option>
-            <option value="トップス＆ボトムス">トップス＆ボトムス</option>
-            <option value="シューズ">シューズ</option>
-            <option value="アクセサリー">アクセサリー</option>
-          </select>
-        </div>
-
-        <div class="modal-buttons">
-          <button type="submit" class="btn-save">保存</button>
-          <button type="button" class="btn-cancel" onclick="closeModal()">キャンセル</button>
-        </div>
-        <button type="button" class="btn-delete-card" id="btnDeleteCard" style="display:none;" onclick="deleteCurrentCard()">このカードを削除</button>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    // デフォルトの初期カードデータ
-    const defaultCardData = [
-      { id: "01-01", series: "13-1", name: "ピンクステージベスト", type: "キュート", category: "トップス", rarity: "N", brand: "Angery Suger" },
-      { id: "01-02", series: "13-1", name: "ピンクステージスカート", type: "キュート", category: "ボトムス", rarity: "N", brand: "Angery Suger" },
-      { id: "01-03", series: "13-1", name: "ピンクステージハイヒール", type: "キュート", category: "シューズ", rarity: "N", brand: "Angery Suger" },
-      { id: "01-07", series: "13-1", name: "天の川こうざんトップス", type: "クール", category: "トップス", rarity: "PR", brand: "FUTURING GIRL" },
-      { id: "02-01", series: "13-2", name: "オーロラキスキャミソール", type: "キュート", category: "トップス", rarity: "PR", brand: "Angery Suger" },
-      { id: "02-02", series: "13-2", name: "オーロラドレープスカート", type: "キュート", category: "ボトムス", rarity: "PR", brand: "Angery Suger" },
-      { id: "14 01-01", series: "14-1", name: "ミュージカルスコーピオンジャケット", type: "クール", category: "トップス", rarity: "PR", brand: "Swing ROCK" },
-      { id: "15 01-01", series: "15-1", name: "オデットスワントップス", type: "セクシー", category: "トップス", rarity: "PR", brand: "Dolly devil" },
-      { id: "16 04-01", series: "16-4", name: "アイスブルーフリルキャミソール", type: "ポップ", category: "トップス", rarity: "R", brand: "MAGICAL TOY" },
-      { id: "16 04-02", series: "16-4", name: "アイスブルーフリルパニエ", type: "ポップ", category: "ボトムス", rarity: "R", brand: "MAGICAL TOY" }
-    ];
-
-    // レアリティの並べ替え順位定義
-    const rarityRank = {
-      'PR': 4,
-      'CP': 3,
-      'R': 2,
-      'N': 1
-    };
-
-    // シリーズに対応する型番プレフィックスの定義
-    const seriesPrefixMap = {
-      "13-1": "01-", "13-2": "02-", "13-3": "03-", "13-4": "04-", "13-5": "05-", "13-6": "06-",
-      "14-1": "14 01-", "14-2": "14 02-", "14-3": "14 03-", "14-4": "14 04-", "14-5": "14 05-", "14-6": "14 06-",
-      "15-1": "15 01-", "15-2": "15 02-", "15-3": "15 03-", "15-4": "15 04-", "15-5": "15 05-", "15-6": "15 06-",
-      "16-1": "16 01-", "16-2": "16 02-", "16-3": "16 03-", "16-4": "16 04-"
-    };
-
-    // ローカルストレージからデータ取得
-    let cardData = JSON.parse(localStorage.getItem('aikatsu_master_cards')) || defaultCardData;
-    let userState = JSON.parse(localStorage.getItem('aikatsu_card_app_data')) || {};
-    let userImages1 = JSON.parse(localStorage.getItem('aikatsu_card_images1')) || {};
-    let userImages2 = JSON.parse(localStorage.getItem('aikatsu_card_images2')) || {};
-
-    const cardGrid = document.getElementById('cardGrid');
-    const seriesFilter = document.getElementById('seriesFilter');
-    const typeFilter = document.getElementById('typeFilter');
-    const rarityFilter = document.getElementById('rarityFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    const sortSelect = document.getElementById('sortSelect');
-    const searchInput = document.getElementById('searchInput');
-    const statsDisplay = document.getElementById('statsDisplay');
-    const progressBar = document.getElementById('progressBar');
-
-    // モーダル要素の取得
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalTitle = document.getElementById('modalTitle');
-    const editCardKey = document.getElementById('editCardKey');
-    const seriesSelect = document.getElementById('seriesSelect');
-    const cardIdInput = document.getElementById('cardIdInput');
-    const cardNameInput = document.getElementById('cardNameInput');
-    const typeSelect = document.getElementById('typeSelect');
-    const raritySelect = document.getElementById('raritySelect');
-    const brandSelect = document.getElementById('brandSelect');
-    const customBrandContainer = document.getElementById('customBrandContainer');
-    const customBrandInput = document.getElementById('customBrandInput');
-    const categorySelect = document.getElementById('categorySelect');
-    const btnDeleteCard = document.getElementById('btnDeleteCard');
-
-    // 型番を比較可能な数値配列に分解・パースする強化された関数
-    function parseCardId(card) {
-      const seriesStr = card.series || "";
-      let year = 13;
-      let stage = 1;
-
-      if (seriesStr.includes('-')) {
-        const parts = seriesStr.split('-');
-        year = parseInt(parts[0], 10) || 13;
-        stage = parseInt(parts[1], 10) || 1;
-      }
-
-      // card.id 内の数値抽出（例: "14 01-05" -> [14, 1, 5] / "01-05" -> [1, 5]）
-      const idStr = card.id || "";
-      const matches = idStr.match(/\d+/g) || [];
-      const nums = matches.map(n => parseInt(n, 10));
-
-      let cardStage = stage;
-      let cardNum = 0;
-
-      if (nums.length >= 3) {
-        cardStage = nums[1];
-        cardNum = nums[2];
-      } else if (nums.length === 2) {
-        cardStage = nums[0];
-        cardNum = nums[1];
-      } else if (nums.length === 1) {
-        cardNum = nums[0];
-      }
-
-      return { year, stage: cardStage, num: cardNum };
-    }
-
-    // 型番比較関数
-    function compareCards(a, b, isAscending) {
-      const pA = parseCardId(a);
-      const pB = parseCardId(b);
-
-      if (pA.year !== pB.year) {
-        return isAscending ? pA.year - pB.year : pB.year - pA.year;
-      }
-      if (pA.stage !== pB.stage) {
-        return isAscending ? pA.stage - pB.stage : pB.stage - pA.stage;
-      }
-      return isAscending ? pA.num - pB.num : pB.num - pA.num;
-    }
-
-    // レンダリング関数
-    function render() {
-      cardGrid.innerHTML = '';
-
-      const selectedSeries = seriesFilter.value;
-      const selectedType = typeFilter.value;
-      const selectedRarity = rarityFilter.value;
-      const selectedStatus = statusFilter.value;
-      const selectedSort = sortSelect.value;
-      const searchText = searchInput.value.toLowerCase().trim();
-
-      let ownedCount = 0;
-
-      let list = cardData.map((card, index) => ({ card, originalIndex: index }));
-
-      // 絞り込み処理
-      list = list.filter(item => {
-        const card = item.card;
-        const state = userState[card.id] || { owned: false, qty: 0 };
-        const isOwned = state.owned;
-
-        if (selectedSeries !== 'ALL' && card.series !== selectedSeries) return false;
-        if (selectedType !== 'ALL' && card.type !== selectedType) return false;
-        if (selectedRarity !== 'ALL' && (card.rarity || 'N') !== selectedRarity) return false;
-        if (selectedStatus === 'OWNED' && !isOwned) return false;
-        if (selectedStatus === 'UNOWNED' && isOwned) return false;
-        
-        if (searchText) {
-          const nameMatch = card.name.toLowerCase().includes(searchText);
-          const idMatch = card.id.toLowerCase().includes(searchText);
-          const brandMatch = card.brand ? card.brand.toLowerCase().includes(searchText) : false;
-          if (!nameMatch && !idMatch && !brandMatch) return false;
-        }
-
-        return true;
-      });
-
-      // 並べ替え処理
-      if (selectedSort === 'ID_ASC') {
-        list.sort((a, b) => compareCards(a.card, b.card, true));
-      } else if (selectedSort === 'ID_DESC') {
-        list.sort((a, b) => compareCards(a.card, b.card, false));
-      } else if (selectedSort === 'RARITY_DESC') {
-        list.sort((a, b) => (rarityRank[b.card.rarity || 'N'] || 0) - (rarityRank[a.card.rarity || 'N'] || 0));
-      } else if (selectedSort === 'RARITY_ASC') {
-        list.sort((a, b) => (rarityRank[a.card.rarity || 'N'] || 0) - (rarityRank[b.card.rarity || 'N'] || 0));
-      }
-
-      // 所持数のカウント（全カード対象）
-      cardData.forEach(card => {
-        const state = userState[card.id] || { owned: false, qty: 0 };
-        if (state.owned) ownedCount++;
-      });
-
-      // カード要素の生成・表示
-      list.forEach(item => {
-        const card = item.card;
-        const index = item.originalIndex;
-        const state = userState[card.id] || { owned: false, qty: 0 };
-        const isOwned = state.owned;
-
-        const img1 = userImages1[card.id] || '';
-        const img2 = userImages2[card.id] || '';
-
-        const cardEl = document.createElement('div');
-        cardEl.className = `card-item ${isOwned ? 'owned' : ''}`;
-        cardEl.setAttribute('data-type', card.type);
-
-        cardEl.innerHTML = `
-          <button class="edit-btn-icon" onclick="openModal('edit', ${index})">編集</button>
-          
-          <div class="card-badge-container">
-            <div class="card-badge">${card.id} / ${card.type}</div>
-            <div class="rarity-badge">${card.rarity || 'N'}</div>
-          </div>
-          
-          <!-- めくり可能画像領域 -->
-          <div class="card-flip-container">
-            <div class="card-flipper" id="flipper-${card.id}">
-              <div class="card-face front" onclick="triggerUpload('${card.id}', 1)">
-                ${img1 ? `<img src="${img1}" alt="表面">` : `<div class="upload-hint">📷 画像1を追加</div>`}
-              </div>
-              <div class="card-face back" onclick="triggerUpload('${card.id}', 2)">
-                ${img2 ? `<img src="${img2}" alt="裏面">` : `<div class="upload-hint">📷 画像2を追加</div>`}
-              </div>
-            </div>
-          </div>
-
-          <div class="image-controls">
-            <button class="flip-btn" onclick="flipCard('${card.id}')">🔄 めくる</button>
-            <button class="img-del-btn" onclick="clearImages('${card.id}')" title="画像を消去">🗑️</button>
-          </div>
-
-          <input type="file" id="file1-${card.id}" class="file-input" accept="image/*" onchange="handleImageUpload(event, '${card.id}', 1)">
-          <input type="file" id="file2-${card.id}" class="file-input" accept="image/*" onchange="handleImageUpload(event, '${card.id}', 2)">
-
-          <div class="card-title">${card.name}</div>
-          ${card.brand ? `<div class="card-brand">${card.brand}</div>` : ''}
-          <div class="card-meta">${card.category}</div>
-
-          <button class="check-btn" onclick="toggleOwned('${card.id}')">
-            ${isOwned ? '✓ 所持中' : '未所持'}
-          </button>
-
-          ${isOwned ? `
-            <div class="quantity-control">
-              <button class="qty-btn" onclick="updateQty('${card.id}', -1)">-</button>
-              <span class="qty-count">${state.qty || 1}枚</span>
-              <button class="qty-btn" onclick="updateQty('${card.id}', 1)">+</button>
-            </div>
-          ` : ''}
-        `;
-
-        cardGrid.appendChild(cardEl);
-      });
-
-      // 進捗状況計算
-      const totalCards = cardData.length;
-      const percent = totalCards > 0 ? Math.round((ownedCount / totalCards) * 100) : 0;
-      statsDisplay.innerText = `所持率: ${ownedCount} / ${totalCards} 枚 (${percent}%)`;
-      progressBar.style.width = `${percent}%`;
-    }
-
-    // シリーズ選択時に型番プレフィックスを自動補完する関数
-    function autoFillCardIdPrefix() {
-      const selectedSeries = seriesSelect.value;
-      const prefix = seriesPrefixMap[selectedSeries];
-      if (prefix) {
-        cardIdInput.value = prefix;
+    @media (min-width: 600px) {
+      .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 20px;
       }
     }
 
-    // ブランド選択時のカスタム入力切り替え
-    function toggleCustomBrandInput() {
-      if (brandSelect.value === 'OTHER') {
-        customBrandContainer.style.display = 'block';
-        customBrandInput.required = true;
-      } else {
-        customBrandContainer.style.display = 'none';
-        customBrandInput.required = false;
-        customBrandInput.value = '';
-      }
+    .card-item {
+      perspective: 1000px;
+      height: 260px;
     }
 
-    // めくりアニメーション
-    function flipCard(id) {
-      const flipper = document.getElementById(`flipper-${id}`);
-      if (flipper) flipper.classList.toggle('is-flipped');
-    }
-
-    // 画像選択トリガー
-    function triggerUpload(id, num) {
-      document.getElementById(`file${num}-${id}`).click();
-    }
-
-    // 画像保存
-    function handleImageUpload(event, id, num) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        if (num === 1) {
-          userImages1[id] = e.target.result;
-          localStorage.setItem('aikatsu_card_images1', JSON.stringify(userImages1));
-        } else {
-          userImages2[id] = e.target.result;
-          localStorage.setItem('aikatsu_card_images2', JSON.stringify(userImages2));
-        }
-        render();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // 画像クリア機能
-    function clearImages(id) {
-      if (confirm('このカードの登録画像を消去しますか？')) {
-        delete userImages1[id];
-        delete userImages2[id];
-        localStorage.setItem('aikatsu_card_images1', JSON.stringify(userImages1));
-        localStorage.setItem('aikatsu_card_images2', JSON.stringify(userImages2));
-        render();
-      }
-    }
-
-    // 所持フラグ切替
-    function toggleOwned(id) {
-      if (!userState[id]) {
-        userState[id] = { owned: true, qty: 1 };
-      } else {
-        userState[id].owned = !userState[id].owned;
-        if (userState[id].owned && (!userState[id].qty || userState[id].qty < 1)) {
-          userState[id].qty = 1;
-        }
-      }
-      localStorage.setItem('aikatsu_card_app_data', JSON.stringify(userState));
-      render();
-    }
-
-    // 枚数更新
-    function updateQty(id, delta) {
-      if (!userState[id]) return;
-      let currentQty = userState[id].qty || 1;
-      currentQty += delta;
-      if (currentQty <= 0) {
-        userState[id].owned = false;
-        userState[id].qty = 0;
-      } else {
-        userState[id].qty = currentQty;
-      }
-      localStorage.setItem('aikatsu_card_app_data', JSON.stringify(userState));
-      render();
-    }
-
-    /* 一括操作機能 */
-    function bulkSetOwned(status) {
-      const selectedSeries = seriesFilter.value;
-      const selectedType = typeFilter.value;
-      const selectedRarity = rarityFilter.value;
-      const searchText = searchInput.value.toLowerCase().trim();
-
-      const msg = status ? "現在絞り込んで表示されているカードを【すべて所持】に設定しますか？" : "現在絞り込んで表示されているカードを【すべて未所持】に設定しますか？";
-      if (!confirm(msg)) return;
-
-      cardData.forEach(card => {
-        if (selectedSeries !== 'ALL' && card.series !== selectedSeries) return;
-        if (selectedType !== 'ALL' && card.type !== selectedType) return;
-        if (selectedRarity !== 'ALL' && (card.rarity || 'N') !== selectedRarity) return;
-        if (searchText) {
-          const nameMatch = card.name.toLowerCase().includes(searchText);
-          const idMatch = card.id.toLowerCase().includes(searchText);
-          const brandMatch = card.brand ? card.brand.toLowerCase().includes(searchText) : false;
-          if (!nameMatch && !idMatch && !brandMatch) return;
-        }
-
-        userState[card.id] = { owned: status, qty: status ? 1 : 0 };
-      });
-
-      localStorage.setItem('aikatsu_card_app_data', JSON.stringify(userState));
-      render();
-    }
-
-    /* モーダル表示・編集・登録制御 */
-    function openModal(mode, index = null) {
-      if (mode === 'add') {
-        modalTitle.innerText = 'カード新規登録';
-        editCardKey.value = '';
-        document.getElementById('cardForm').reset();
-        autoFillCardIdPrefix();
-        brandSelect.value = 'ノーブランド';
-        toggleCustomBrandInput();
-        btnDeleteCard.style.display = 'none';
-      } else if (mode === 'edit' && index !== null) {
-        modalTitle.innerText = 'カード編集';
-        editCardKey.value = index;
-        const card = cardData[index];
-        seriesSelect.value = card.series || '13-1';
-        cardIdInput.value = card.id || '';
-        cardNameInput.value = card.name || '';
-        typeSelect.value = card.type || 'キュート';
-        raritySelect.value = card.rarity || 'N';
-        
-        // ブランドの初期選択制御
-        const existingOptions = Array.from(brandSelect.options).map(o => o.value);
-        if (existingOptions.includes(card.brand)) {
-          brandSelect.value = card.brand;
-          customBrandInput.value = '';
-        } else if (card.brand) {
-          brandSelect.value = 'OTHER';
-          customBrandInput.value = card.brand;
-        } else {
-          brandSelect.value = 'ノーブランド';
-          customBrandInput.value = '';
-        }
-        toggleCustomBrandInput();
-
-        categorySelect.value = card.category || 'トップス';
-        btnDeleteCard.style.display = 'block';
-      }
-      modalOverlay.classList.add('active');
-    }
-
-    function closeModal() {
-      modalOverlay.classList.remove('active');
-    }
-
-    function handleFormSubmit(event) {
-      event.preventDefault();
-
-      const indexStr = editCardKey.value;
-      
-      // ブランド値の決定
-      let selectedBrand = brandSelect.value;
-      if (selectedBrand === 'OTHER') {
-        selectedBrand = customBrandInput.value.trim();
-      }
-
-      const newCard = {
-        id: cardIdInput.value.trim(),
-        series: seriesSelect.value,
-        name: cardNameInput.value.trim(),
-        type: typeSelect.value,
-        rarity: raritySelect.value,
-        brand: selectedBrand,
-        category: categorySelect.value
-      };
-
-      if (indexStr === '') {
-        // 新規登録
-        cardData.push(newCard);
-      } else {
-        // 更新処理（IDが変わった場合は画像や所持データも追従）
-        const oldIndex = parseInt(indexStr, 10);
-        const oldId = cardData[oldIndex].id;
-        if (oldId !== newCard.id) {
-          if (userState[oldId]) {
-            userState[newCard.id] = userState[oldId];
-            delete userState[oldId];
-          }
-          if (userImages1[oldId]) {
-            userImages1[newCard.id] = userImages1[oldId];
-            delete userImages1[oldId];
-          }
-          if (userImages2[oldId]) {
-            userImages2[newCard.id] = userImages2[oldId];
-            delete userImages2[oldId];
-          }
-        }
-        cardData[oldIndex] = newCard;
-      }
-
-      // ローカルストレージへ保存
-      localStorage.setItem('aikatsu_master_cards', JSON.stringify(cardData));
-      localStorage.setItem('aikatsu_card_app_data', JSON.stringify(userState));
-      localStorage.setItem('aikatsu_card_images1', JSON.stringify(userImages1));
-      localStorage.setItem('aikatsu_card_images2', JSON.stringify(userImages2));
-
-      closeModal();
-      render();
-    }
-
-    function deleteCurrentCard() {
-      const indexStr = editCardKey.value;
-      if (indexStr === '') return;
-
-      const index = parseInt(indexStr, 10);
-      const card = cardData[index];
-
-      if (confirm(`「${card.name}」をリストから削除しますか？`)) {
-        delete userState[card.id];
-        delete userImages1[card.id];
-        delete userImages2[card.id];
-        cardData.splice(index, 1);
-
-        localStorage.setItem('aikatsu_master_cards', JSON.stringify(cardData));
-        localStorage.setItem('aikatsu_card_app_data', JSON.stringify(userState));
-        localStorage.setItem('aikatsu_card_images1', JSON.stringify(userImages1));
-        localStorage.setItem('aikatsu_card_images2', JSON.stringify(userImages2));
-
-        closeModal();
-        render();
-      }
-    }
-
-    // 初回レンダリングの実行
-    render();
-  </script>
-</body>
-</html>
+    .card-inner {
