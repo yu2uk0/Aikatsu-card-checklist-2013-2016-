@@ -536,6 +536,30 @@
       cursor: pointer;
       margin-top: 5px;
     }
+    
+    /* 新しいカードを登録ボタンを画面右下に固定表示 */
+.add-btn, #addCardBtn, .floating-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #ff69b4, #ff1493); /* アイカツ風ピンク */
+  border: none;
+  border-radius: 50px; /* 丸みのあるデザイン */
+  box-shadow: 0 4px 12px rgba(255, 20, 147, 0.4);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* タップ時の押し込み効果 */
+.add-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(255, 20, 147, 0.4);
+}
   </style>
 </head>
 <body>
